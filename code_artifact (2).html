@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王权的车库 | WANGQUAN'S GARAGE</title>
+    
+    <!-- 加载 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 加载 Google 字体: Montserrat (高级无衬线), Oswald (机械感标题), Noto Sans SC (现代中文) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&family=Oswald:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --brand-color: #f4f4f4;
+            --bg-color: #000000;
+            --bugatti-blue: #0055A4; /* 经典布加迪蓝，作为极少量的点缀 */
+        }
+        
+        body {
+            font-family: 'Montserrat', 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--brand-color);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* 字体系统 (摒弃传统衬线，全面复刻布加迪的顶级现代工业风) */
+        .font-serif-cn { font-family: 'Noto Sans SC', sans-serif; }
+        .font-serif-en { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+        .font-sans { font-family: 'Montserrat', sans-serif; }
+
+        /* 王权专属红色徽标 (致敬 Bugatti 经典的 Macaron 椭圆标) */
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #BE001A; /* 经典超跑红 */
+            color: #FFFFFF;
+            padding: 6px 22px; 
+            border-radius: 50px / 25px; /* 打造完美的椭圆形 */
+            border: 2px solid #EAEAEA;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 500;
+            font-size: 1.15rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        .brand-badge:hover {
+            transform: scale(1.05);
+        }
+        .brand-badge::before {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px; right: 2px; bottom: 2px;
+            border: 1.5px dotted rgba(255,255,255,0.7);
+            border-radius: 46px / 22px;
+            pointer-events: none;
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* 滚动淡入动画 (更缓慢，更符合老钱风) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 图片缓慢放大视差 */
+        .parallax-img {
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .img-wrapper:hover .parallax-img {
+            transform: scale(1.05);
+        }
+
+        /* 布加迪标志性箭头按钮 */
+        .btn-bugatti {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Jost', sans-serif;
+            font-weight: 400;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #fff;
+            position: relative;
+            padding-bottom: 6px;
+            transition: color 0.4s ease;
+        }
+        .btn-bugatti::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: rgba(255,255,255,0.3);
+            transition: background-color 0.4s ease;
+        }
+        .btn-bugatti .arrow {
+            margin-left: 12px;
+            transition: transform 0.4s ease;
+        }
+        .btn-bugatti:hover {
+            color: #ccc;
+        }
+        .btn-bugatti:hover::after {
+            background-color: #fff;
+        }
+        .btn-bugatti:hover .arrow {
+            transform: translateX(5px);
+        }
+
+        /* 纵向装饰线 - 布加迪常用的架构感设计 */
+        .vertical-line {
+            position: absolute;
+            left: 50%;
+            width: 1px;
+            height: 100px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-50%);
+        }
+
+        /* 全局高级噪点 */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.025;
+            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gray-800 selection:text-white">
+
+    <div class="noise-overlay"></div>
+
+    <!-- 极简导航栏 (1:1 复刻 Bugatti 风格) -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 py-6 px-6 md:px-12 flex justify-between items-center border-b border-transparent bg-transparent">
+        <!-- 左侧：汉堡菜单 + Menu 字样 -->
+        <div class="flex items-center space-x-4 cursor-pointer group z-50">
+            <button class="flex flex-col space-y-[5px] focus:outline-none">
+                <span class="w-7 h-[2px] bg-white block transition-all group-hover:bg-gray-400"></span>
+                <span class="w-7 h-[2px] bg-white block transition-all group-hover:bg-gray-400"></span>
+                <span class="w-7 h-[2px] bg-white block transition-all group-hover:bg-gray-400"></span>
+            </button>
+            <span class="hidden md:block text-white font-sans text-xs tracking-widest uppercase font-semibold group-hover:text-gray-400 transition-colors">菜单</span>
+        </div>
+
+        <!-- 居中：经典红色椭圆徽标 -->
+        <div class="absolute left-1/2 transform -translate-x-1/2 text-center cursor-pointer z-50">
+            <div class="brand-badge">WANGQUAN</div>
+        </div>
+        
+        <!-- 右侧：查找伙伴 -->
+        <div class="hidden md:flex items-center z-50">
+            <a href="#" class="text-[0.7rem] tracking-[0.2em] font-sans font-semibold text-white hover:text-gray-400 transition-colors">
+                寻找合作伙伴
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-screen w-full flex flex-col justify-end items-center text-center overflow-hidden pb-32">
+        <div class="absolute inset-0 z-0">
+            <!-- 黑车背景 -->
+            <img src="微信图片_20260614122003_1293_80.jpg" alt="Wangquan Black Hypercar Exterior" class="w-full h-full object-cover object-center scale-[1.02] animate-[pulse_25s_ease-in-out_infinite_alternate]">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/20"></div>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center reveal active w-full px-4">
+            <h2 class="text-[0.65rem] font-sans tracking-[0.6em] mb-6 text-white/60 uppercase pl-[0.6em]">极致性能的巅峰</h2>
+            <h1 class="text-5xl md:text-7xl lg:text-[7rem] font-sans font-light tracking-[0.4em] mb-2 leading-none text-white drop-shadow-2xl pl-[0.4em]">
+                WANGQUAN
+            </h1>
+            <h1 class="text-xl md:text-2xl font-serif-cn font-light tracking-[0.6em] mt-4 mb-12 text-white/80 pl-[0.6em]">
+                王权的车库
+            </h1>
+            
+            <a href="#quote" class="mt-16 flex flex-col items-center group opacity-70 hover:opacity-100 transition-opacity duration-500 cursor-pointer">
+                <span class="font-sans text-[0.65rem] tracking-[0.5em] text-white uppercase mb-4 ml-[0.5em]">探索愿景</span>
+                <span class="w-[1px] h-16 bg-gradient-to-b from-white/80 to-transparent group-hover:h-24 transition-all duration-700 ease-out"></span>
+            </a>
+        </div>
+    </header>
+
+    <!-- 致敬 Ettore Bugatti 的格言区域 -->
+    <section id="quote" class="py-40 relative bg-black flex flex-col items-center justify-center border-t border-white/5">
+        <div class="vertical-line -top-12"></div>
+        <div class="container mx-auto px-6 md:px-24 text-center max-w-5xl reveal">
+            <p class="font-serif-cn text-3xl md:text-5xl lg:text-6xl leading-[1.4] text-white font-light tracking-[0.1em] mb-12">
+                "如果它是可以被比拟的，<br>
+                <span class="text-gray-500 italic">那就不是王权。</span>"
+            </p>
+            <p class="font-serif-en text-sm tracking-[0.3em] uppercase text-white/40">The Philosophy</p>
+        </div>
+        <div class="vertical-line -bottom-12"></div>
+    </section>
+
+    <!-- 画廊布局 (The Blue Series) - 已移除重叠效果，改为并排显示 -->
+    <section id="models" class="py-32 relative bg-[#050505]">
+        <div class="container mx-auto px-6 md:px-12 max-w-7xl">
+            
+            <!-- 标题区域 -->
+            <div class="reveal mb-24">
+                <h4 class="text-[0.65rem] font-sans tracking-[0.4em] uppercase text-white/40 mb-4 border-l pl-4 border-white/20">Chapter 1</h4>
+                <h2 class="text-5xl md:text-7xl font-serif-en text-white mb-2 tracking-wide">THE <span class="text-gray-500">BLUE</span> BLAZE</h2>
+                <h3 class="text-xl md:text-2xl font-serif-cn font-light tracking-[0.2em] text-white/60">碳纤蓝焰 · 极简重构</h3>
+            </div>
+
+            <!-- 网格布局：左右分明，取消了负边距引起的重叠 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+                
+                <!-- 左侧：大图 (外部细节) -->
+                <div class="lg:col-span-7 img-wrapper overflow-hidden reveal relative">
+                    <div class="absolute inset-0 bg-black/10 z-10 pointer-events-none"></div>
+                    <img src="微信图片_20260614122001_1292_80.jpg" alt="Blue X Detail" class="w-full h-[60vh] lg:h-[80vh] object-cover parallax-img brightness-90">
+                </div>
+
+                <!-- 右侧：小图 (内饰) + 文字 (移除了 lg:-ml-24) -->
+                <div class="lg:col-span-5 flex flex-col justify-center z-20 reveal" style="transition-delay: 0.2s;">
+                    <!-- 悬浮的小图 -->
+                    <div class="img-wrapper overflow-hidden mb-12 border-[0.5px] border-white/20 shadow-2xl bg-black">
+                        <img src="微信图片_20260614122000_1291_80.jpg" alt="Blue Interior" class="w-full h-[40vh] object-cover parallax-img opacity-90">
+                    </div>
+                    
+                    <div class="bg-transparent lg:p-0">
+                        <h3 class="font-serif-en text-2xl mb-4 text-white tracking-widest">BESPOKE CABIN</h3>
+                        <p class="font-sans text-gray-400 font-light text-sm md:text-base leading-relaxed tracking-wide mb-8 text-justify">
+                            从深邃的X型空气动力学前灯，到舱内大面积的湖蓝色顶级 Alcantara。王权的车库不仅仅是性能的堆砌，更是高级定制（Bespoke）艺术的终极展现。每一处缝线，都在诉说绝对的掌控权。
+                        </p>
+                        <a href="#" class="btn-bugatti">Discover Bespoke <span class="arrow">→</span></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 传世之作 - 巨幅横屏区域 -->
+    <section id="masterpiece" class="relative bg-black border-y border-white/10">
+        <div class="w-full h-[70vh] md:h-[100vh] img-wrapper overflow-hidden relative">
+            <img src="微信图片_20260614121959_1290_80.jpg" alt="Wangquan Silver Blue" class="w-full h-full object-cover object-center parallax-img opacity-80">
+            
+            <!-- 强烈的渐变压暗，凸显文字 -->
+            <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent flex items-center z-10">
+                <div class="container mx-auto px-6 md:px-16 lg:px-24 reveal w-full">
+                    <div class="max-w-2xl">
+                        <p class="text-[0.6rem] font-sans tracking-[0.5em] text-white/50 uppercase mb-6 border-b border-white/20 pb-4 inline-block">L'Art de l'Automobile</p>
+                        <h2 class="text-4xl md:text-7xl font-serif-en text-white leading-tight mb-4 drop-shadow-lg">
+                            SCULPTED <br>BY <span class="italic text-gray-400">SPEED</span>
+                        </h2>
+                        <h3 class="text-xl md:text-2xl font-serif-cn font-light tracking-[0.3em] text-white mb-10">金属狂潮，静止的极速风暴</h3>
+                        <a href="#" class="btn-bugatti">View Gallery <span class="arrow">→</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 巨型性能数据展示 (布加迪风格核心) -->
+    <section class="py-32 bg-[#020202] relative overflow-hidden">
+        <!-- 巨大的水印背景字 -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none z-0 opacity-[0.03]">
+            <span class="text-[12rem] md:text-[20rem] font-serif-en font-black tracking-tighter text-white whitespace-nowrap">W16 QUAD</span>
+        </div>
+
+        <div class="container mx-auto px-6 max-w-7xl relative z-10">
+            <div class="text-center mb-24 reveal">
+                <h2 class="text-[0.7rem] font-sans tracking-[0.4em] uppercase text-white/50">By The Numbers</h2>
+            </div>
+
+            <!-- 数据网格，使用极细的边框分割 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 border-t border-b border-white/10">
+                
+                <div class="py-16 md:border-r border-white/10 text-center reveal" style="transition-delay: 0.1s;">
+                    <div class="font-serif-en text-7xl md:text-8xl text-white mb-2">1,500</div>
+                    <div class="font-sans text-[0.65rem] tracking-[0.3em] uppercase text-gray-500">Horsepower</div>
+                </div>
+
+                <div class="py-16 md:border-r border-white/10 text-center reveal" style="transition-delay: 0.2s;">
+                    <div class="font-serif-en text-7xl md:text-8xl text-white mb-2">380</div>
+                    <div class="font-sans text-[0.65rem] tracking-[0.3em] uppercase text-gray-500">Top Speed (KM/H)</div>
+                </div>
+
+                <div class="py-16 text-center reveal" style="transition-delay: 0.3s;">
+                    <div class="font-serif-en text-7xl md:text-8xl text-white mb-2">2.4</div>
+                    <div class="font-sans text-[0.65rem] tracking-[0.3em] uppercase text-gray-500">Seconds (0-100 KM/H)</div>
+                </div>
+
+            </div>
+            
+            <div class="text-center mt-20 reveal">
+                <a href="#" class="btn-bugatti">Technical Specifications <span class="arrow">→</span></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 严谨的奢华页脚 -->
+    <footer class="bg-black pt-24 pb-12 border-t border-white/20">
+        <div class="container mx-auto px-6 md:px-16 max-w-7xl">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+                <div class="md:col-span-2">
+                    <div class="font-serif-en text-2xl font-bold tracking-[0.3em] uppercase text-white mb-6">WANGQUAN</div>
+                    <p class="font-serif-cn text-xs text-gray-500 tracking-[0.1em] leading-loose max-w-sm">
+                        释放极致的驾驶体验。<br>为追求不可能的纯粹主义者而生。
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-serif-cn text-sm tracking-[0.2em] text-white mb-8">车型大全</h4>
+                    <ul class="space-y-4 font-sans text-xs text-gray-400 tracking-widest">
+                        <li><a href="#" class="hover:text-white transition-colors">碳纤蓝焰</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">传世银蓝</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">高级定制</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-serif-cn text-sm tracking-[0.2em] text-white mb-8">探索品牌</h4>
+                    <ul class="space-y-4 font-sans text-xs text-gray-400 tracking-widest">
+                        <li><a href="#" class="hover:text-white transition-colors">品牌历史</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">最新资讯</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">联系我们</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 font-sans text-[0.6rem] text-gray-600 tracking-[0.1em]">
+                <p>&copy; 2026 王权的车库. 保留所有权利。</p>
+                <div class="flex space-x-6 mt-6 md:mt-0">
+                    <a href="#" class="hover:text-gray-300 transition-colors">隐私政策</a>
+                    <a href="#" class="hover:text-gray-300 transition-colors">法律声明</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果：向下滚动时出现下边框并加深背景
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-black/95', 'backdrop-blur-md', 'border-white/10');
+                navbar.classList.remove('border-transparent');
+            } else {
+                navbar.classList.remove('bg-black/95', 'backdrop-blur-md', 'border-white/10');
+                navbar.classList.add('border-transparent');
+            }
+        });
+
+        // 视差滚动与淡入效果
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                // 当元素距离视口底部还有 100px 时触发动画
+                var elementVisible = 100;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        window.addEventListener("scroll", reveal);
+        // 页面加载时执行一次，确保首屏元素显示
+        reveal();
+    </script>
+</body>
+</html>
